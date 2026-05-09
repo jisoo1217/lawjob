@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로펌잡 - 변호사 수습 채용 공고</title>
+  <style>
+    :root {
+      --green: #1D9E75;
+      --green-soft: #E6F5EF;
+      --orange: #F39C12;
+      --orange-soft: #FEF3E2;
+      --blue: #3498DB;
+      --blue-soft: #E5F1FB;
+      --gray: #95A5A6;
+      --gray-soft: #ECEFF1;
+      --text: #1A1A1A;
+      --text-sub: #6B7280;
+      --border: #E5E7EB;
+      --bg: #FAFAFA;
+      --card-bg: #FFFFFF;
+      --danger: #E74C3C;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+        "Pretendard", "Malgun Gothic", "맑은 고딕", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      max-width: 560px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .logo .accent {
+      color: var(--green);
+    }
+
+    /* Sort tabs */
+    .sort-bar {
+      display: flex;
+      gap: 8px;
+      padding: 14px 20px 10px;
+    }
+
+    .sort-btn {
+      flex: 0 0 auto;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .sort-btn.active {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text);
+    }
+
+    /* Job list */
+    .job-list {
+      padding: 6px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .firm {
+      font-size: 13px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .dday {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .dday.active {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .dday.urgent {
+      background: #FCE7E5;
+      color: var(--danger);
+    }
+
+    .dday.closed {
+      background: var(--gray-soft);
+      color: var(--text-sub);
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 10px;
+      line-height: 1.4;
+      letter-spacing: -0.3px;
+    }
+
+    .deadline {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+
+    .deadline strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Stage info (마감 후) */
+    .stage-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 10px;
+    }
+
+    .stage-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: -0.2px;
+    }
+
+    .stage-badge.review {
+      background: var(--orange-soft);
+      color: var(--orange);
+    }
+
+    .stage-badge.interview {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .stage-badge.done {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .stage-badge.unknown {
+      background: var(--gray-soft);
+      color: var(--text-sub);
+    }
+
+    .stage-checked {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    /* Open chat button */
+    .chat-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+
+    .chat-btn:hover {
+      opacity: 0.9;
+    }
+
+    .chat-btn:active {
+      opacity: 0.8;
+    }
+
+    .chat-btn .icon {
+      font-size: 15px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-sub);
+      font-size: 14px;
+    }
+
+    @media (min-width: 480px) {
+      body { font-size: 15px; }
+      .title { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="logo">로<span class="accent">펌</span>잡</h1>
+    </header>
+
+    <div class="sort-bar">
+      <button class="sort-btn active" data-sort="recent">최신순</button>
+      <button class="sort-btn" data-sort="deadline">마감일순</button>
+    </div>
+
+    <main class="job-list" id="job-list"></main>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    const STAGE_LABELS = {
+      review:    "서류 검토 중",
+      interview: "면접 진행 중",
+      done:      "채용 완료",
+      unknown:   "미확인"
+    };
+
+    const TODAY = new Date(new Date().toISOString().slice(0, 10));
+
+    function parseDate(str) {
+      return new Date(str);
+    }
+
+    function diffDays(target) {
+      const t = parseDate(target);
+      const ms = t - TODAY;
+      return Math.ceil(ms / (1000 * 60 * 60 * 24));
+    }
+
+    function formatDeadline(str) {
+      const d = parseDate(str);
+      const days = ["일", "월", "화", "수", "목", "금", "토"];
+      return `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+    }
+
+    function ddayLabel(deadline) {
+      const d = diffDays(deadline);
+      if (d > 0)  return { text: `D-${d}`, cls: d <= 3 ? "urgent" : "active" };
+      if (d === 0) return { text: "D-DAY", cls: "urgent" };
+      return { text: "마감", cls: "closed" };
+    }
+
+    function isClosed(deadline) {
+      return diffDays(deadline) < 0;
+    }
+
+    function renderCard(p) {
+      const dd = ddayLabel(p.deadline);
+      const closed = isClosed(p.deadline);
+
+      let stageBlock = "";
+      if (closed) {
+        const stageKey = p.stage || "unknown";
+        const label = STAGE_LABELS[stageKey] || STAGE_LABELS.unknown;
+        const checked = p.stageCheckedAt
+          ? `${p.stageCheckedAt} 확인`
+          : "확인 시간 미상";
+        stageBlock = `
+          <div class="stage-row">
+            <span class="stage-badge ${stageKey}">${label}</span>
+            <span class="stage-checked">${checked}</span>
+          </div>
+        `;
+      }
+
+      return `
+        <article class="card">
+          <div class="card-top">
+            <span class="firm">${p.firm}</span>
+            <span class="dday ${dd.cls}">${dd.text}</span>
+          </div>
+          <h2 class="title">${p.title}</h2>
+          <div class="deadline">마감 <strong>${formatDeadline(p.deadline)}</strong></div>
+          ${stageBlock}
+          <a class="chat-btn" href="${p.openChatUrl}" target="_blank" rel="noopener">
+            <span class="icon">💬</span>
+            <span>오픈채팅 참여하기</span>
+          </a>
+        </article>
+      `;
+    }
+
+    function sortPostings(list, mode) {
+      const arr = [...list];
+      if (mode === "deadline") {
+        // 마감 전 우선 (가까운 순) → 마감된 것 (최근 마감 순)
+        arr.sort((a, b) => {
+          const aClosed = isClosed(a.deadline);
+          const bClosed = isClosed(b.deadline);
+          if (aClosed !== bClosed) return aClosed ? 1 : -1;
+          return parseDate(a.deadline) - parseDate(b.deadline);
+        });
+      } else {
+        // 최신순: 등록일 내림차순
+        arr.sort((a, b) => parseDate(b.postedAt) - parseDate(a.postedAt));
+      }
+      return arr;
+    }
+
+    function render(mode) {
+      const list = sortPostings(POSTINGS, mode);
+      const root = document.getElementById("job-list");
+      if (list.length === 0) {
+        root.innerHTML = `<div class="empty">등록된 공고가 없습니다.</div>`;
+        return;
+      }
+      root.innerHTML = list.map(renderCard).join("");
+    }
+
+    // Sort button handlers
+    document.querySelectorAll(".sort-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sort-btn").forEach((b) =>
+          b.classList.remove("active")
+        );
+        btn.classList.add("active");
+        render(btn.dataset.sort);
+      });
+    });
+
+    render("recent");
+  </script>
+</body>
+</html>
