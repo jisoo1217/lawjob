@@ -315,16 +315,18 @@
       let stageBlock = "";
       if (closed) {
         const stageKey = p.stage || "unknown";
-        const label = STAGE_LABELS[stageKey] || STAGE_LABELS.unknown;
-        const checked = p.stageCheckedAt
-          ? `${p.stageCheckedAt} 확인`
-          : "확인 시간 미상";
-        stageBlock = `
-          <div class="stage-row">
-            <span class="stage-badge ${stageKey}">${label}</span>
-            <span class="stage-checked">${checked}</span>
-          </div>
-        `;
+        if (stageKey === "interview" || stageKey === "done") {
+          const label = STAGE_LABELS[stageKey];
+          const checked = p.stageCheckedAt
+            ? `${p.stageCheckedAt} 확인`
+            : "확인 시간 미상";
+          stageBlock = `
+            <div class="stage-row">
+              <span class="stage-badge ${stageKey}">${label}</span>
+              <span class="stage-checked">${checked}</span>
+            </div>
+          `;
+        }
       }
 
       return `
