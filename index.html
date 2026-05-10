@@ -87,6 +87,7 @@
     }
 
     .admin-toggle {
+      display: none;
       border: 1px solid var(--border);
       background: #fff;
       color: var(--text);
@@ -94,6 +95,10 @@
       padding: 8px 11px;
       font-size: 13px;
       font-weight: 700;
+    }
+
+    .admin-entry .admin-toggle {
+      display: inline-flex;
     }
 
     .tabs,
@@ -313,11 +318,6 @@
       border-radius: 8px;
     }
 
-    .stage-badge.review {
-      background: var(--orange-soft);
-      color: var(--orange);
-    }
-
     .stage-badge.interview {
       background: var(--blue-soft);
       color: var(--blue);
@@ -326,11 +326,6 @@
     .stage-badge.done {
       background: var(--green-soft);
       color: var(--green);
-    }
-
-    .stage-badge.unknown {
-      background: #E5E7EB;
-      color: var(--gray);
     }
 
     .stage-checked {
@@ -396,7 +391,7 @@
     <header class="header">
       <div class="header-row">
         <h1 class="logo">로<span class="accent">펌</span>잡</h1>
-        <button class="admin-toggle" type="button" id="admin-toggle">관리자</button>
+        <button class="admin-toggle" type="button" id="admin-toggle">관리자 로그인</button>
       </div>
     </header>
 
@@ -413,10 +408,8 @@
         <div class="field">
           <label for="stage">채용 단계</label>
           <select id="stage" name="stage">
-            <option value="review">서류 검토 중</option>
             <option value="interview">면접 진행 중</option>
             <option value="done">채용 완료</option>
-            <option value="unknown">미확인</option>
           </select>
         </div>
         <div class="field">
@@ -483,10 +476,8 @@
   <script src="data.js"></script>
   <script>
     const STAGE_LABELS = {
-      review: "서류 검토 중",
       interview: "면접 진행 중",
-      done: "채용 완료",
-      unknown: "미확인"
+      done: "채용 완료"
     };
 
     const SOURCE_LABELS = {
@@ -494,13 +485,16 @@
       jobcenter: "취업정보센터"
     };
 
+    const ADMIN_PASSCODE = "lawjob-admin-2026";
+    const ADMIN_QUERY = new URLSearchParams(window.location.search).get("admin") === "1";
+    const ADMIN_SESSION_KEY = "lawjob-admin-auth";
     const STORAGE_KEY = "lawjob-postings-v2";
     const TODAY = new Date(new Date().toISOString().slice(0, 10));
 
     const state = {
       source: "all",
       sort: "recent",
-      admin: false,
+      admin: ADMIN_QUERY && sessionStorage.getItem(ADMIN_SESSION_KEY) === "1",
       postings: loadPostings()
     };
 
@@ -520,16 +514,54 @@
 
     function loadPostings() {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return [...POSTINGS];
+      if (!saved) return normalizePostings([...POSTINGS]);
       try {
-        return JSON.parse(saved);
+        return normalizePostings(JSON.parse(saved));
       } catch {
-        return [...POSTINGS];
+        return normalizePostings([...POSTINGS]);
       }
+    }
+
+    function normalizePostings(postings) {
+      return postings.map((posting) => ({
+        ...posting,
+        stage: posting.stage === "done" ? "done" : "interview"
+      }));
     }
 
     function savePostings() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.postings));
+    }
+
+    async function syncPostingsFromServer() {
+      try {
+        const response = await fetch("/api/postings", { cache: "no-store" });
+        if (!response.ok) return false;
+        const data = await response.json();
+        state.postings = normalizePostings(data.postings || []);
+        savePostings();
+        render();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function postJson(url, payload) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error("Server update failed");
+      }
+
+      const data = await response.json();
+      state.postings = normalizePostings(data.postings || state.postings);
+      savePostings();
+      render();
     }
 
     function diffDays(target) {
@@ -585,7 +617,8 @@
 
     function renderCard(p) {
       const dd = ddayLabel(p.deadline);
-      const stageKey = p.stage || "unknown";
+      const stageKey = p.stage || "interview";
+      const normalizedStage = STAGE_LABELS[stageKey] ? stageKey : "interview";
       const checked = p.stageCheckedAt ? `${p.stageCheckedAt} 확인` : "확인 시간 미상";
       const isJobcenter = p.source === "jobcenter";
       const details = isJobcenter ? "" : getVisibleDetails(p);
@@ -610,7 +643,7 @@
             <span>마감 ${formatDeadline(p.deadline)}</span>
           </div>
           <div class="stage-row">
-            <span class="stage-badge ${stageKey}">${STAGE_LABELS[stageKey]}</span>
+            <span class="stage-badge ${normalizedStage}">${STAGE_LABELS[normalizedStage]}</span>
             <span class="stage-checked">${checked}</span>
           </div>
           ${details}
@@ -618,7 +651,7 @@
           <div class="admin-stage">
             <select data-stage-select="${p.id}">
               ${Object.entries(STAGE_LABELS).map(([key, label]) => (
-                `<option value="${key}" ${key === stageKey ? "selected" : ""}>${label}</option>`
+                `<option value="${key}" ${key === normalizedStage ? "selected" : ""}>${label}</option>`
               )).join("")}
             </select>
             <input data-stage-time="${p.id}" value="${escapeHtml(p.stageCheckedAt || nowString())}" />
@@ -647,7 +680,10 @@
 
     function render() {
       const app = document.getElementById("app");
+      app.classList.toggle("admin-entry", ADMIN_QUERY);
       app.classList.toggle("admin-mode", state.admin);
+      document.getElementById("admin-panel").classList.toggle("open", state.admin);
+      document.getElementById("admin-toggle").textContent = state.admin ? "관리자 종료" : "관리자 로그인";
 
       const root = document.getElementById("job-list");
       const list = filteredPostings();
@@ -656,7 +692,7 @@
         : `<div class="empty">등록된 공고가 없습니다.</div>`;
     }
 
-    function addPosting(form) {
+    async function addPosting(form) {
       const data = Object.fromEntries(new FormData(form).entries());
       const nextId = Math.max(0, ...state.postings.map((p) => Number(p.id))) + 1;
       const posting = {
@@ -682,13 +718,18 @@
 
       state.postings.push(posting);
       savePostings();
+      try {
+        await postJson("/api/postings", posting);
+      } catch {
+        render();
+      }
       form.reset();
       setDefaultDates();
       syncSourceFields();
       render();
     }
 
-    function updateStage(id) {
+    async function updateStage(id) {
       const posting = state.postings.find((p) => Number(p.id) === Number(id));
       if (!posting) return;
       const stage = document.querySelector(`[data-stage-select="${id}"]`).value;
@@ -697,6 +738,15 @@
       posting.stageCheckedAt = time || nowString();
       savePostings();
       render();
+      try {
+        await postJson("/api/stages", {
+          id: posting.id,
+          stage: posting.stage,
+          stageCheckedAt: posting.stageCheckedAt
+        });
+      } catch {
+        render();
+      }
     }
 
     function setDefaultDates() {
@@ -713,9 +763,30 @@
       document.getElementById("externalUrl").required = isJobcenter;
     }
 
+    function authenticateAdmin() {
+      if (!ADMIN_QUERY) return false;
+      if (sessionStorage.getItem(ADMIN_SESSION_KEY) === "1") return true;
+
+      const input = window.prompt("관리자 비밀번호를 입력하세요.");
+      if (input !== ADMIN_PASSCODE) {
+        window.alert("관리자 비밀번호가 일치하지 않습니다.");
+        return false;
+      }
+
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+      return true;
+    }
+
     document.getElementById("admin-toggle").addEventListener("click", () => {
-      state.admin = !state.admin;
-      document.getElementById("admin-panel").classList.toggle("open", state.admin);
+      if (state.admin) {
+        sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        state.admin = false;
+        render();
+        return;
+      }
+
+      if (!authenticateAdmin()) return;
+      state.admin = true;
       render();
     });
 
@@ -756,9 +827,18 @@
       updateStage(button.dataset.stageSave);
     });
 
+    window.addEventListener("storage", (event) => {
+      if (event.key !== STORAGE_KEY) return;
+      state.postings = loadPostings();
+      render();
+    });
+
     setDefaultDates();
     syncSourceFields();
+    savePostings();
     render();
+    syncPostingsFromServer();
+    window.setInterval(syncPostingsFromServer, 3000);
   </script>
 </body>
 </html>

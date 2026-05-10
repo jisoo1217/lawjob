@@ -5,10 +5,8 @@
 // - "jobcenter" : 취업정보센터 공고. 외부 게시글 링크만 입력합니다.
 //
 // stage:
-// - "review"    : 서류 검토 중
 // - "interview" : 면접 진행 중
 // - "done"      : 채용 완료
-// - "unknown"   : 미확인
 
 const POSTINGS = [
   {
@@ -18,7 +16,7 @@ const POSTINGS = [
     title: "신입변호사 모집",
     deadline: "2026-05-06",
     postedAt: "2026-04-06",
-    stage: "review",
+    stage: "interview",
     stageCheckedAt: "2026-05-09",
     location: "서울 성동구 아차산로17길 48 성수 SK V1 CENTER I 306호",
     salary: "월 300~350만원 (세전)",
@@ -46,7 +44,7 @@ const POSTINGS = [
     title: "신입변호사 채용",
     deadline: "2026-05-14",
     postedAt: "2026-05-09",
-    stage: "review",
+    stage: "interview",
     stageCheckedAt: "2026-05-09 16:00",
     location: "서울 서초구 서초대로 254 오퓨런스 7층 710호",
     salary: "월 600만원 이상 (세전)",
@@ -74,7 +72,7 @@ const POSTINGS = [
     title: "신입변호사 채용",
     deadline: "2026-05-20",
     postedAt: "2026-05-10",
-    stage: "review",
+    stage: "interview",
     stageCheckedAt: "2026-05-10",
     location: "서울 서초구 ...",
     salary: "월 500만원 이상",
@@ -102,7 +100,7 @@ const POSTINGS = [
     title: "취업정보센터 공고 예시",
     postedAt: "2026-05-10",
     deadline: "2026-05-31",
-    stage: "unknown",
+    stage: "interview",
     stageCheckedAt: "",
     externalUrl: "https://www.koreanbar.or.kr"
   }
