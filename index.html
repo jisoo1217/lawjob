@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>로펌잡 - 변호사 수습 채용 공고</title>
+  <title>로펌잡 - 변호사 채용 공고</title>
   <style>
     :root {
-      --green: #1D9E75;
+      --green: #158765;
       --green-soft: #E6F5EF;
-      --orange: #F39C12;
+      --orange: #D97706;
       --orange-soft: #FEF3E2;
-      --blue: #3498DB;
+      --blue: #2563EB;
       --blue-soft: #E5F1FB;
-      --gray: #95A5A6;
-      --gray-soft: #ECEFF1;
-      --text: #1A1A1A;
+      --red: #DC2626;
+      --gray: #6B7280;
+      --gray-soft: #F3F4F6;
+      --text: #111827;
       --text-sub: #6B7280;
       --border: #E5E7EB;
-      --bg: #FAFAFA;
+      --bg: #F8FAFC;
       --card-bg: #FFFFFF;
-      --danger: #E74C3C;
     }
 
     * {
@@ -27,7 +27,8 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -39,27 +40,44 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
     .app {
-      max-width: 560px;
+      max-width: 720px;
       margin: 0 auto;
       min-height: 100vh;
       background: var(--bg);
     }
 
-    /* Header */
     .header {
       position: sticky;
       top: 0;
       z-index: 10;
       background: var(--card-bg);
       border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
+      padding: 14px 18px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .logo {
       font-size: 22px;
       font-weight: 800;
-      letter-spacing: -0.5px;
+      letter-spacing: 0;
       color: var(--text);
       margin: 0;
     }
@@ -68,35 +86,143 @@
       color: var(--green);
     }
 
-    /* Sort tabs */
+    .admin-toggle {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tabs,
     .sort-bar {
       display: flex;
       gap: 8px;
-      padding: 14px 20px 10px;
+      overflow-x: auto;
+      padding: 12px 18px 0;
     }
 
+    .sort-bar {
+      padding-top: 8px;
+      padding-bottom: 10px;
+    }
+
+    .tab-btn,
     .sort-btn {
       flex: 0 0 auto;
-      padding: 8px 16px;
+      padding: 8px 13px;
       border: 1px solid var(--border);
       background: var(--card-bg);
-      border-radius: 999px;
+      border-radius: 8px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 700;
       color: var(--text-sub);
-      cursor: pointer;
-      transition: all 0.15s ease;
     }
 
+    .tab-btn.active,
     .sort-btn.active {
       background: var(--text);
       color: #fff;
       border-color: var(--text);
     }
 
-    /* Job list */
+    .admin-panel {
+      display: none;
+      margin: 6px 16px 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 8px;
+    }
+
+    .admin-panel.open {
+      display: block;
+    }
+
+    .admin-title {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .field textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .link-btn {
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .primary-btn {
+      border: 1px solid var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+    }
+
+    .link-btn {
+      display: block;
+      border: 1px solid var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
     .job-list {
-      padding: 6px 16px 40px;
+      padding: 6px 16px 44px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -105,31 +231,49 @@
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 18px 16px;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-top,
+    .meta-row,
+    .stage-row,
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .card-top {
-      display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
       margin-bottom: 8px;
     }
 
     .firm {
       font-size: 13px;
       color: var(--text-sub);
-      font-weight: 500;
+      font-weight: 700;
     }
 
-    .dday {
+    .source-badge,
+    .dday,
+    .stage-badge {
       font-size: 12px;
-      font-weight: 700;
-      padding: 4px 9px;
-      border-radius: 6px;
-      flex-shrink: 0;
-      letter-spacing: -0.2px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 7px;
+    }
+
+    .source-badge.seoulbar {
+      background: #EEF2FF;
+      color: #3730A3;
+    }
+
+    .source-badge.jobcenter {
+      background: #ECFDF5;
+      color: #047857;
     }
 
     .dday.active {
@@ -138,8 +282,8 @@
     }
 
     .dday.urgent {
-      background: #FCE7E5;
-      color: var(--danger);
+      background: #FEE2E2;
+      color: var(--red);
     }
 
     .dday.closed {
@@ -148,43 +292,25 @@
     }
 
     .title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 800;
       color: var(--text);
       margin: 0 0 10px;
-      line-height: 1.4;
-      letter-spacing: -0.3px;
+      line-height: 1.35;
+      letter-spacing: 0;
     }
 
-    .deadline {
-      font-size: 13px;
+    .meta-row {
       color: var(--text-sub);
-      margin-bottom: 14px;
+      font-size: 13px;
+      margin-bottom: 10px;
     }
 
-    .deadline strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    /* Stage info (마감 후) */
     .stage-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-      padding: 10px 12px;
-      background: var(--bg);
-      border-radius: 10px;
-    }
-
-    .stage-badge {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 999px;
-      letter-spacing: -0.2px;
+      margin: 10px 0 12px;
+      padding: 10px;
+      background: var(--gray-soft);
+      border-radius: 8px;
     }
 
     .stage-badge.review {
@@ -203,68 +329,152 @@
     }
 
     .stage-badge.unknown {
-      background: var(--gray-soft);
-      color: var(--text-sub);
+      background: #E5E7EB;
+      color: var(--gray);
     }
 
     .stage-checked {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-sub);
     }
 
-    /* Open chat button */
-    .chat-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 12px 16px;
-      background: var(--green);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: opacity 0.15s ease;
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 7px 10px;
+      padding-top: 4px;
+      margin-bottom: 12px;
+      font-size: 13px;
     }
 
-    .chat-btn:hover {
-      opacity: 0.9;
+    .detail-grid dt {
+      color: var(--text-sub);
+      font-weight: 800;
     }
 
-    .chat-btn:active {
-      opacity: 0.8;
+    .detail-grid dd {
+      margin: 0;
+      color: var(--text);
+      white-space: pre-line;
+      overflow-wrap: anywhere;
     }
 
-    .chat-btn .icon {
-      font-size: 15px;
+    .admin-stage {
+      display: none;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .admin-mode .admin-stage {
+      display: grid;
     }
 
     .empty {
       text-align: center;
-      padding: 60px 20px;
+      padding: 56px 20px;
       color: var(--text-sub);
       font-size: 14px;
     }
 
-    @media (min-width: 480px) {
-      body { font-size: 15px; }
-      .title { font-size: 17px; }
+    @media (max-width: 560px) {
+      .admin-grid,
+      .admin-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="app" id="app">
     <header class="header">
-      <h1 class="logo">로<span class="accent">펌</span>잡</h1>
+      <div class="header-row">
+        <h1 class="logo">로<span class="accent">펌</span>잡</h1>
+        <button class="admin-toggle" type="button" id="admin-toggle">관리자</button>
+      </div>
     </header>
 
+    <section class="admin-panel" id="admin-panel">
+      <h2 class="admin-title">공고 추가</h2>
+      <form id="posting-form" class="admin-grid">
+        <div class="field">
+          <label for="source">구분</label>
+          <select id="source" name="source">
+            <option value="seoulbar">서울지방변호사회</option>
+            <option value="jobcenter">취업정보센터</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="stage">채용 단계</label>
+          <select id="stage" name="stage">
+            <option value="review">서류 검토 중</option>
+            <option value="interview">면접 진행 중</option>
+            <option value="done">채용 완료</option>
+            <option value="unknown">미확인</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="firm">로펌명</label>
+          <input id="firm" name="firm" required />
+        </div>
+        <div class="field">
+          <label for="title">제목</label>
+          <input id="title" name="title" required />
+        </div>
+        <div class="field">
+          <label for="postedAt">등록일</label>
+          <input id="postedAt" name="postedAt" type="date" required />
+        </div>
+        <div class="field">
+          <label for="deadline">마감일</label>
+          <input id="deadline" name="deadline" type="date" required />
+        </div>
+        <div class="field source-field">
+          <label for="location">위치</label>
+          <input id="location" name="location" />
+        </div>
+        <div class="field source-field">
+          <label for="salary">급여</label>
+          <input id="salary" name="salary" />
+        </div>
+        <div class="field source-field">
+          <label for="workHours">근무시간</label>
+          <input id="workHours" name="workHours" />
+        </div>
+        <div class="field source-field">
+          <label for="applicationEmail">지원 이메일</label>
+          <input id="applicationEmail" name="applicationEmail" type="email" />
+        </div>
+        <div class="field source-field full">
+          <label for="description">기타 설명</label>
+          <textarea id="description" name="description"></textarea>
+        </div>
+        <div class="field link-field full">
+          <label for="externalUrl">취업정보센터 게시글 링크</label>
+          <input id="externalUrl" name="externalUrl" type="url" />
+        </div>
+        <div class="admin-actions field full">
+          <button class="primary-btn" type="submit">공고 추가</button>
+          <button class="secondary-btn" type="button" id="reset-local">임시 변경 초기화</button>
+        </div>
+      </form>
+    </section>
+
+    <nav class="tabs" aria-label="공고 출처">
+      <button class="tab-btn active" type="button" data-source="all">전체</button>
+      <button class="tab-btn" type="button" data-source="seoulbar">서울지방변호사회</button>
+      <button class="tab-btn" type="button" data-source="jobcenter">취업정보센터</button>
+    </nav>
+
     <div class="sort-bar">
-      <button class="sort-btn active" data-sort="recent">최신순</button>
-      <button class="sort-btn" data-sort="deadline">마감일순</button>
+      <button class="sort-btn active" type="button" data-sort="recent">최신순</button>
+      <button class="sort-btn" type="button" data-sort="deadline">마감일순</button>
     </div>
 
     <main class="job-list" id="job-list"></main>
@@ -273,21 +483,57 @@
   <script src="data.js"></script>
   <script>
     const STAGE_LABELS = {
-      review:    "서류 검토 중",
+      review: "서류 검토 중",
       interview: "면접 진행 중",
-      done:      "채용 완료",
-      unknown:   "미확인"
+      done: "채용 완료",
+      unknown: "미확인"
     };
 
+    const SOURCE_LABELS = {
+      seoulbar: "서울지방변호사회",
+      jobcenter: "취업정보센터"
+    };
+
+    const STORAGE_KEY = "lawjob-postings-v2";
     const TODAY = new Date(new Date().toISOString().slice(0, 10));
 
+    const state = {
+      source: "all",
+      sort: "recent",
+      admin: false,
+      postings: loadPostings()
+    };
+
     function parseDate(str) {
-      return new Date(str);
+      return new Date(str || "2999-12-31");
+    }
+
+    function todayString() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function nowString() {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function loadPostings() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return [...POSTINGS];
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return [...POSTINGS];
+      }
+    }
+
+    function savePostings() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.postings));
     }
 
     function diffDays(target) {
-      const t = parseDate(target);
-      const ms = t - TODAY;
+      const ms = parseDate(target) - TODAY;
       return Math.ceil(ms / (1000 * 60 * 60 * 24));
     }
 
@@ -299,92 +545,220 @@
 
     function ddayLabel(deadline) {
       const d = diffDays(deadline);
-      if (d > 0)  return { text: `D-${d}`, cls: d <= 3 ? "urgent" : "active" };
+      if (d > 0) return { text: `D-${d}`, cls: d <= 3 ? "urgent" : "active" };
       if (d === 0) return { text: "D-DAY", cls: "urgent" };
       return { text: "마감", cls: "closed" };
     }
 
-    function isClosed(deadline) {
-      return diffDays(deadline) < 0;
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getVisibleDetails(p) {
+      const fields = [
+        ["위치", p.location],
+        ["급여", p.salary],
+        ["근무시간", p.workHours],
+        ["지원 이메일", p.applicationEmail],
+        ["모집 부문", p.jobType],
+        ["자격 요건", p.requirements],
+        ["근무 시작일", p.startDate],
+        ["전형 절차", p.process],
+        ["제출 서류", p.documents],
+        ["복지", p.benefits],
+        ["홈페이지", p.homepage],
+        ["기타", p.description]
+      ];
+
+      const rows = fields
+        .filter(([, value]) => value)
+        .map(([label, value]) => `<dt>${label}</dt><dd>${escapeHtml(value)}</dd>`)
+        .join("");
+
+      return rows ? `<dl class="detail-grid">${rows}</dl>` : "";
     }
 
     function renderCard(p) {
       const dd = ddayLabel(p.deadline);
-      const closed = isClosed(p.deadline);
-
-      let stageBlock = "";
-      if (closed) {
-        const stageKey = p.stage || "unknown";
-        if (stageKey === "interview" || stageKey === "done") {
-          const label = STAGE_LABELS[stageKey];
-          const checked = p.stageCheckedAt
-            ? `${p.stageCheckedAt} 확인`
-            : "확인 시간 미상";
-          stageBlock = `
-            <div class="stage-row">
-              <span class="stage-badge ${stageKey}">${label}</span>
-              <span class="stage-checked">${checked}</span>
-            </div>
-          `;
-        }
-      }
+      const stageKey = p.stage || "unknown";
+      const checked = p.stageCheckedAt ? `${p.stageCheckedAt} 확인` : "확인 시간 미상";
+      const isJobcenter = p.source === "jobcenter";
+      const details = isJobcenter ? "" : getVisibleDetails(p);
+      const action = isJobcenter
+        ? `<a class="link-btn" href="${escapeHtml(p.externalUrl || "#")}" target="_blank" rel="noopener">게시글 열기</a>`
+        : p.applicationEmail
+          ? `<a class="link-btn" href="mailto:${escapeHtml(p.applicationEmail)}">이메일 지원</a>`
+          : "";
 
       return `
-        <article class="card">
+        <article class="card" data-id="${p.id}">
           <div class="card-top">
-            <span class="firm">${p.firm}</span>
+            <div>
+              <span class="firm">${escapeHtml(p.firm)}</span>
+              <span class="source-badge ${p.source}">${SOURCE_LABELS[p.source]}</span>
+            </div>
             <span class="dday ${dd.cls}">${dd.text}</span>
           </div>
-          <h2 class="title">${p.title}</h2>
-          <div class="deadline">마감 <strong>${formatDeadline(p.deadline)}</strong></div>
-          ${stageBlock}
-          <a class="chat-btn" href="${p.openChatUrl}" target="_blank" rel="noopener">
-            <span class="icon">💬</span>
-            <span>오픈채팅 참여하기</span>
-          </a>
+          <h2 class="title">${escapeHtml(p.title)}</h2>
+          <div class="meta-row">
+            <span>등록 ${escapeHtml(p.postedAt)}</span>
+            <span>마감 ${formatDeadline(p.deadline)}</span>
+          </div>
+          <div class="stage-row">
+            <span class="stage-badge ${stageKey}">${STAGE_LABELS[stageKey]}</span>
+            <span class="stage-checked">${checked}</span>
+          </div>
+          ${details}
+          <div class="card-actions">${action}</div>
+          <div class="admin-stage">
+            <select data-stage-select="${p.id}">
+              ${Object.entries(STAGE_LABELS).map(([key, label]) => (
+                `<option value="${key}" ${key === stageKey ? "selected" : ""}>${label}</option>`
+              )).join("")}
+            </select>
+            <input data-stage-time="${p.id}" value="${escapeHtml(p.stageCheckedAt || nowString())}" />
+            <button class="secondary-btn" type="button" data-stage-save="${p.id}">단계 저장</button>
+          </div>
         </article>
       `;
     }
 
-    function sortPostings(list, mode) {
+    function sortPostings(list) {
       const arr = [...list];
-      if (mode === "deadline") {
-        // 마감 전 우선 (가까운 순) → 마감된 것 (최근 마감 순)
-        arr.sort((a, b) => {
-          const aClosed = isClosed(a.deadline);
-          const bClosed = isClosed(b.deadline);
-          if (aClosed !== bClosed) return aClosed ? 1 : -1;
-          return parseDate(a.deadline) - parseDate(b.deadline);
-        });
+      if (state.sort === "deadline") {
+        arr.sort((a, b) => parseDate(a.deadline) - parseDate(b.deadline));
       } else {
-        // 최신순: 등록일 내림차순
         arr.sort((a, b) => parseDate(b.postedAt) - parseDate(a.postedAt));
       }
       return arr;
     }
 
-    function render(mode) {
-      const list = sortPostings(POSTINGS, mode);
-      const root = document.getElementById("job-list");
-      if (list.length === 0) {
-        root.innerHTML = `<div class="empty">등록된 공고가 없습니다.</div>`;
-        return;
-      }
-      root.innerHTML = list.map(renderCard).join("");
+    function filteredPostings() {
+      const list = state.source === "all"
+        ? state.postings
+        : state.postings.filter((p) => p.source === state.source);
+      return sortPostings(list);
     }
 
-    // Sort button handlers
-    document.querySelectorAll(".sort-btn").forEach((btn) => {
+    function render() {
+      const app = document.getElementById("app");
+      app.classList.toggle("admin-mode", state.admin);
+
+      const root = document.getElementById("job-list");
+      const list = filteredPostings();
+      root.innerHTML = list.length
+        ? list.map(renderCard).join("")
+        : `<div class="empty">등록된 공고가 없습니다.</div>`;
+    }
+
+    function addPosting(form) {
+      const data = Object.fromEntries(new FormData(form).entries());
+      const nextId = Math.max(0, ...state.postings.map((p) => Number(p.id))) + 1;
+      const posting = {
+        id: nextId,
+        source: data.source,
+        firm: data.firm.trim(),
+        title: data.title.trim(),
+        postedAt: data.postedAt,
+        deadline: data.deadline,
+        stage: data.stage,
+        stageCheckedAt: nowString()
+      };
+
+      if (data.source === "jobcenter") {
+        posting.externalUrl = data.externalUrl.trim();
+      } else {
+        posting.location = data.location.trim();
+        posting.salary = data.salary.trim();
+        posting.workHours = data.workHours.trim();
+        posting.applicationEmail = data.applicationEmail.trim();
+        posting.description = data.description.trim();
+      }
+
+      state.postings.push(posting);
+      savePostings();
+      form.reset();
+      setDefaultDates();
+      syncSourceFields();
+      render();
+    }
+
+    function updateStage(id) {
+      const posting = state.postings.find((p) => Number(p.id) === Number(id));
+      if (!posting) return;
+      const stage = document.querySelector(`[data-stage-select="${id}"]`).value;
+      const time = document.querySelector(`[data-stage-time="${id}"]`).value.trim();
+      posting.stage = stage;
+      posting.stageCheckedAt = time || nowString();
+      savePostings();
+      render();
+    }
+
+    function setDefaultDates() {
+      document.getElementById("postedAt").value = todayString();
+      document.getElementById("deadline").value = todayString();
+    }
+
+    function syncSourceFields() {
+      const isJobcenter = document.getElementById("source").value === "jobcenter";
+      document.querySelectorAll(".source-field").forEach((el) => {
+        el.style.display = isJobcenter ? "none" : "flex";
+      });
+      document.querySelector(".link-field").style.display = isJobcenter ? "flex" : "none";
+      document.getElementById("externalUrl").required = isJobcenter;
+    }
+
+    document.getElementById("admin-toggle").addEventListener("click", () => {
+      state.admin = !state.admin;
+      document.getElementById("admin-panel").classList.toggle("open", state.admin);
+      render();
+    });
+
+    document.getElementById("posting-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      addPosting(event.currentTarget);
+    });
+
+    document.getElementById("source").addEventListener("change", syncSourceFields);
+
+    document.getElementById("reset-local").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      state.postings = [...POSTINGS];
+      render();
+    });
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".sort-btn").forEach((b) =>
-          b.classList.remove("active")
-        );
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
-        render(btn.dataset.sort);
+        state.source = btn.dataset.source;
+        render();
       });
     });
 
-    render("recent");
+    document.querySelectorAll(".sort-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sort-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.sort = btn.dataset.sort;
+        render();
+      });
+    });
+
+    document.getElementById("job-list").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-stage-save]");
+      if (!button) return;
+      updateStage(button.dataset.stageSave);
+    });
+
+    setDefaultDates();
+    syncSourceFields();
+    render();
   </script>
 </body>
 </html>
