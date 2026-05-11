@@ -7,6 +7,45 @@ const root = __dirname;
 const statePath = path.join(root, "server-state.json");
 const port = Number(process.env.PORT || 8080);
 const allowedStages = new Set(["hidden", "interview", "done"]);
+const detailFields = [
+  "address",
+  "representative",
+  "homepage",
+  "contact",
+  "sizeAndEtc",
+  "hiringCount",
+  "employmentType",
+  "duties",
+  "workStartDate",
+  "dailyWorkHours",
+  "wage",
+  "overtimePay",
+  "workPlace",
+  "workDays",
+  "holidays",
+  "annualLeave",
+  "fourInsurances",
+  "maternityLeave",
+  "menstrualLeave",
+  "parentalLeave",
+  "bonus",
+  "mealSupport",
+  "otherBenefits",
+  "career",
+  "certifications",
+  "otherRequirements",
+  "preferences",
+  "documents",
+  "process",
+  "resumeItems",
+  "coverLetterItems",
+  "applicationDeadline",
+  "notifyMethod",
+  "applicationMethod",
+  "manager",
+  "description",
+  "externalUrl"
+];
 
 function readBasePostings() {
   const code = fs.readFileSync(path.join(root, "data.js"), "utf8");
@@ -61,7 +100,7 @@ function mergedPostings() {
 }
 
 function sanitizePosting(input, id) {
-  return {
+  const posting = {
     id,
     source: input.source === "jobcenter" ? "jobcenter" : "seoulbar",
     firm: String(input.firm || "").trim(),
@@ -69,14 +108,14 @@ function sanitizePosting(input, id) {
     postedAt: String(input.postedAt || ""),
     deadline: String(input.deadline || ""),
     stage: normalizeStage(input.stage),
-    stageCheckedAt: String(input.stageCheckedAt || ""),
-    location: String(input.location || "").trim(),
-    salary: String(input.salary || "").trim(),
-    workHours: String(input.workHours || "").trim(),
-    applicationEmail: String(input.applicationEmail || "").trim(),
-    description: String(input.description || "").trim(),
-    externalUrl: String(input.externalUrl || "").trim()
+    stageCheckedAt: String(input.stageCheckedAt || "")
   };
+
+  detailFields.forEach((field) => {
+    posting[field] = String(input[field] || "").trim();
+  });
+
+  return posting;
 }
 
 function sendJson(res, status, body) {

@@ -437,7 +437,7 @@
           </select>
         </div>
         <div class="field">
-          <label for="firm">로펌명</label>
+          <label for="firm">회사명</label>
           <input id="firm" name="firm" required />
         </div>
         <div class="field">
@@ -452,26 +452,42 @@
           <label for="deadline">마감일</label>
           <input id="deadline" name="deadline" type="date" required />
         </div>
-        <div class="field source-field">
-          <label for="location">위치</label>
-          <input id="location" name="location" />
-        </div>
-        <div class="field source-field">
-          <label for="salary">급여</label>
-          <input id="salary" name="salary" />
-        </div>
-        <div class="field source-field">
-          <label for="workHours">근무시간</label>
-          <input id="workHours" name="workHours" />
-        </div>
-        <div class="field source-field">
-          <label for="applicationEmail">지원 이메일</label>
-          <input id="applicationEmail" name="applicationEmail" type="email" />
-        </div>
-        <div class="field source-field full">
-          <label for="description">기타 설명</label>
-          <textarea id="description" name="description"></textarea>
-        </div>
+        <div class="field source-field"><label for="address">주소</label><input id="address" name="address" /></div>
+        <div class="field source-field"><label for="representative">대표</label><input id="representative" name="representative" /></div>
+        <div class="field source-field"><label for="homepage">홈페이지</label><input id="homepage" name="homepage" /></div>
+        <div class="field source-field"><label for="contact">연락처</label><input id="contact" name="contact" /></div>
+        <div class="field source-field full"><label for="sizeAndEtc">규모 및 기타</label><textarea id="sizeAndEtc" name="sizeAndEtc"></textarea></div>
+        <div class="field source-field"><label for="hiringCount">채용인원</label><input id="hiringCount" name="hiringCount" /></div>
+        <div class="field source-field"><label for="employmentType">채용형태</label><input id="employmentType" name="employmentType" /></div>
+        <div class="field source-field full"><label for="duties">담당업무</label><textarea id="duties" name="duties"></textarea></div>
+        <div class="field source-field"><label for="workStartDate">근로게시일</label><input id="workStartDate" name="workStartDate" /></div>
+        <div class="field source-field"><label for="dailyWorkHours">일 근로시간</label><input id="dailyWorkHours" name="dailyWorkHours" /></div>
+        <div class="field source-field"><label for="wage">임금</label><input id="wage" name="wage" /></div>
+        <div class="field source-field"><label for="overtimePay">시간외 근무수당</label><input id="overtimePay" name="overtimePay" /></div>
+        <div class="field source-field"><label for="workPlace">주 근무장소</label><input id="workPlace" name="workPlace" /></div>
+        <div class="field source-field"><label for="workDays">근무일</label><input id="workDays" name="workDays" /></div>
+        <div class="field source-field"><label for="holidays">휴일</label><input id="holidays" name="holidays" /></div>
+        <div class="field source-field"><label for="annualLeave">연차유급휴가</label><input id="annualLeave" name="annualLeave" /></div>
+        <div class="field source-field"><label for="fourInsurances">4대보험</label><input id="fourInsurances" name="fourInsurances" /></div>
+        <div class="field source-field"><label for="maternityLeave">출산휴가</label><input id="maternityLeave" name="maternityLeave" /></div>
+        <div class="field source-field"><label for="menstrualLeave">생리휴가</label><input id="menstrualLeave" name="menstrualLeave" /></div>
+        <div class="field source-field"><label for="parentalLeave">육아휴직</label><input id="parentalLeave" name="parentalLeave" /></div>
+        <div class="field source-field"><label for="bonus">상여금</label><input id="bonus" name="bonus" /></div>
+        <div class="field source-field"><label for="mealSupport">식비 및 식사제공</label><input id="mealSupport" name="mealSupport" /></div>
+        <div class="field source-field full"><label for="otherBenefits">기타복리후생</label><textarea id="otherBenefits" name="otherBenefits"></textarea></div>
+        <div class="field source-field"><label for="career">경력</label><input id="career" name="career" /></div>
+        <div class="field source-field"><label for="certifications">자격증</label><input id="certifications" name="certifications" /></div>
+        <div class="field source-field full"><label for="otherRequirements">기타조건</label><textarea id="otherRequirements" name="otherRequirements"></textarea></div>
+        <div class="field source-field full"><label for="preferences">우대사항</label><textarea id="preferences" name="preferences"></textarea></div>
+        <div class="field source-field full"><label for="documents">제출서류</label><textarea id="documents" name="documents"></textarea></div>
+        <div class="field source-field full"><label for="process">전형절차</label><textarea id="process" name="process"></textarea></div>
+        <div class="field source-field full"><label for="resumeItems">이력서 기재사항</label><textarea id="resumeItems" name="resumeItems"></textarea></div>
+        <div class="field source-field full"><label for="coverLetterItems">자기소개서 기재사항</label><textarea id="coverLetterItems" name="coverLetterItems"></textarea></div>
+        <div class="field source-field"><label for="applicationDeadline">서류접수마감일</label><input id="applicationDeadline" name="applicationDeadline" /></div>
+        <div class="field source-field"><label for="notifyMethod">전형경과 통보방법</label><input id="notifyMethod" name="notifyMethod" /></div>
+        <div class="field source-field full"><label for="applicationMethod">서류접수 방법</label><textarea id="applicationMethod" name="applicationMethod"></textarea></div>
+        <div class="field source-field"><label for="manager">담당자</label><input id="manager" name="manager" /></div>
+        <div class="field source-field full"><label for="description">기타</label><textarea id="description" name="description"></textarea></div>
         <div class="field link-field full">
           <label for="externalUrl">취업정보센터 게시글 링크</label>
           <input id="externalUrl" name="externalUrl" type="url" />
@@ -510,6 +526,47 @@
       seoulbar: "서울지방변호사회",
       jobcenter: "취업정보센터"
     };
+
+    const DETAIL_FIELDS = [
+      ["주소", "address", "location"],
+      ["대표", "representative"],
+      ["홈페이지", "homepage"],
+      ["연락처", "contact"],
+      ["규모 및 기타", "sizeAndEtc", "size"],
+      ["채용인원", "hiringCount"],
+      ["채용형태", "employmentType"],
+      ["담당업무", "duties", "jobType"],
+      ["근로게시일", "workStartDate", "startDate"],
+      ["일 근로시간", "dailyWorkHours", "workHours"],
+      ["임금", "wage", "salary"],
+      ["시간외 근무수당", "overtimePay"],
+      ["주 근무장소", "workPlace"],
+      ["근무일", "workDays"],
+      ["휴일", "holidays"],
+      ["연차유급휴가", "annualLeave"],
+      ["4대보험", "fourInsurances"],
+      ["출산휴가", "maternityLeave"],
+      ["생리휴가", "menstrualLeave"],
+      ["육아휴직", "parentalLeave"],
+      ["상여금", "bonus"],
+      ["식비 및 식사제공", "mealSupport"],
+      ["기타복리후생", "otherBenefits", "benefits"],
+      ["경력", "career"],
+      ["자격증", "certifications"],
+      ["기타조건", "otherRequirements", "requirements"],
+      ["우대사항", "preferences"],
+      ["제출서류", "documents"],
+      ["전형절차", "process"],
+      ["이력서 기재사항", "resumeItems"],
+      ["자기소개서 기재사항", "coverLetterItems"],
+      ["서류접수마감일", "applicationDeadline"],
+      ["전형경과 통보방법", "notifyMethod"],
+      ["서류접수 방법", "applicationMethod", "applicationEmail"],
+      ["담당자", "manager"],
+      ["기타", "description"]
+    ];
+
+    const FORM_FIELD_NAMES = DETAIL_FIELDS.map(([, field]) => field);
 
     const ADMIN_PASSCODE = "lawjob-admin-2026";
     const ADMIN_QUERY = new URLSearchParams(window.location.search).get("admin") === "1";
@@ -635,20 +692,10 @@
     }
 
     function getVisibleDetails(p) {
-      const fields = [
-        ["위치", p.location],
-        ["급여", p.salary],
-        ["근무시간", p.workHours],
-        ["지원 이메일", p.applicationEmail],
-        ["모집 부문", p.jobType],
-        ["자격 요건", p.requirements],
-        ["근무 시작일", p.startDate],
-        ["전형 절차", p.process],
-        ["제출 서류", p.documents],
-        ["복지", p.benefits],
-        ["홈페이지", p.homepage],
-        ["기타", p.description]
-      ];
+      const fields = DETAIL_FIELDS.map(([label, primary, fallback]) => [
+        label,
+        p[primary] || (fallback ? p[fallback] : "")
+      ]);
 
       const rows = fields
         .filter(([, value]) => value)
@@ -760,11 +807,9 @@
       if (data.source === "jobcenter") {
         posting.externalUrl = data.externalUrl.trim();
       } else {
-        posting.location = data.location.trim();
-        posting.salary = data.salary.trim();
-        posting.workHours = data.workHours.trim();
-        posting.applicationEmail = data.applicationEmail.trim();
-        posting.description = data.description.trim();
+        FORM_FIELD_NAMES.forEach((fieldName) => {
+          posting[fieldName] = String(data[fieldName] || "").trim();
+        });
       }
 
       return posting;
@@ -779,17 +824,31 @@
       form.title.value = posting.title || "";
       form.postedAt.value = posting.postedAt || todayString();
       form.deadline.value = posting.deadline || todayString();
-      form.location.value = posting.location || "";
-      form.salary.value = posting.salary || "";
-      form.workHours.value = posting.workHours || "";
-      form.applicationEmail.value = posting.applicationEmail || "";
-      form.description.value = posting.description || "";
+      FORM_FIELD_NAMES.forEach((fieldName) => {
+        if (!form[fieldName]) return;
+        form[fieldName].value = posting[fieldName] || legacyFieldValue(posting, fieldName) || "";
+      });
       form.externalUrl.value = posting.externalUrl || "";
       document.getElementById("form-title").textContent = "공고 수정";
       document.getElementById("submit-posting").textContent = "수정 저장";
       document.getElementById("cancel-edit").hidden = false;
       syncSourceFields();
       document.getElementById("admin-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function legacyFieldValue(posting, fieldName) {
+      const legacy = {
+        address: posting.location,
+        sizeAndEtc: posting.size,
+        duties: posting.jobType,
+        workStartDate: posting.startDate,
+        dailyWorkHours: posting.workHours,
+        wage: posting.salary,
+        otherBenefits: posting.benefits,
+        otherRequirements: posting.requirements,
+        applicationMethod: posting.applicationEmail
+      };
+      return legacy[fieldName] || "";
     }
 
     function clearEditMode() {
