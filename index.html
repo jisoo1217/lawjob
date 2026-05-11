@@ -219,6 +219,16 @@
       color: var(--text);
     }
 
+    .danger-btn {
+      border: 1px solid #FCA5A5;
+      background: #fff;
+      color: #B91C1C;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
     .link-btn {
       display: block;
       border: 1px solid var(--green);
@@ -367,6 +377,17 @@
       display: grid;
     }
 
+    .admin-manage {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .admin-mode .admin-manage {
+      display: grid;
+    }
+
     .empty {
       text-align: center;
       padding: 56px 20px;
@@ -376,7 +397,8 @@
 
     @media (max-width: 560px) {
       .admin-grid,
-      .admin-stage {
+      .admin-stage,
+      .admin-manage {
         grid-template-columns: 1fr;
       }
 
@@ -396,8 +418,9 @@
     </header>
 
     <section class="admin-panel" id="admin-panel">
-      <h2 class="admin-title">공고 추가</h2>
+      <h2 class="admin-title" id="form-title">공고 추가</h2>
       <form id="posting-form" class="admin-grid">
+        <input type="hidden" id="editingId" name="editingId" />
         <div class="field">
           <label for="source">구분</label>
           <select id="source" name="source">
@@ -454,7 +477,8 @@
           <input id="externalUrl" name="externalUrl" type="url" />
         </div>
         <div class="admin-actions field full">
-          <button class="primary-btn" type="submit">공고 추가</button>
+          <button class="primary-btn" type="submit" id="submit-posting">공고 추가</button>
+          <button class="secondary-btn" type="button" id="cancel-edit" hidden>수정 취소</button>
           <button class="secondary-btn" type="button" id="reset-local">임시 변경 초기화</button>
         </div>
       </form>
@@ -566,6 +590,23 @@
       render();
     }
 
+    async function sendJson(url, method, payload) {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: payload ? JSON.stringify(payload) : undefined
+      });
+
+      if (!response.ok) {
+        throw new Error("Server update failed");
+      }
+
+      const data = await response.json();
+      state.postings = normalizePostings(data.postings || state.postings);
+      savePostings();
+      render();
+    }
+
     function diffDays(target) {
       const ms = parseDate(target) - TODAY;
       return Math.ceil(ms / (1000 * 60 * 60 * 24));
@@ -664,6 +705,10 @@
             <input data-stage-time="${p.id}" value="${escapeHtml(p.stageCheckedAt || nowString())}" />
             <button class="secondary-btn" type="button" data-stage-save="${p.id}">단계 저장</button>
           </div>
+          <div class="admin-manage">
+            <button class="secondary-btn" type="button" data-edit-posting="${p.id}">내용 수정</button>
+            <button class="danger-btn" type="button" data-delete-posting="${p.id}">삭제</button>
+          </div>
         </article>
       `;
     }
@@ -699,11 +744,10 @@
         : `<div class="empty">등록된 공고가 없습니다.</div>`;
     }
 
-    async function addPosting(form) {
+    function buildPostingFromForm(form, id) {
       const data = Object.fromEntries(new FormData(form).entries());
-      const nextId = Math.max(0, ...state.postings.map((p) => Number(p.id))) + 1;
       const posting = {
-        id: nextId,
+        id,
         source: data.source,
         firm: data.firm.trim(),
         title: data.title.trim(),
@@ -723,16 +767,81 @@
         posting.description = data.description.trim();
       }
 
-      state.postings.push(posting);
+      return posting;
+    }
+
+    function setEditMode(posting) {
+      const form = document.getElementById("posting-form");
+      form.editingId.value = posting.id;
+      form.source.value = posting.source || "seoulbar";
+      form.stage.value = STAGE_LABELS[posting.stage] ? posting.stage : "interview";
+      form.firm.value = posting.firm || "";
+      form.title.value = posting.title || "";
+      form.postedAt.value = posting.postedAt || todayString();
+      form.deadline.value = posting.deadline || todayString();
+      form.location.value = posting.location || "";
+      form.salary.value = posting.salary || "";
+      form.workHours.value = posting.workHours || "";
+      form.applicationEmail.value = posting.applicationEmail || "";
+      form.description.value = posting.description || "";
+      form.externalUrl.value = posting.externalUrl || "";
+      document.getElementById("form-title").textContent = "공고 수정";
+      document.getElementById("submit-posting").textContent = "수정 저장";
+      document.getElementById("cancel-edit").hidden = false;
+      syncSourceFields();
+      document.getElementById("admin-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function clearEditMode() {
+      const form = document.getElementById("posting-form");
+      form.reset();
+      form.editingId.value = "";
+      document.getElementById("form-title").textContent = "공고 추가";
+      document.getElementById("submit-posting").textContent = "공고 추가";
+      document.getElementById("cancel-edit").hidden = true;
+      setDefaultDates();
+      syncSourceFields();
+    }
+
+    async function savePosting(form) {
+      const editingId = Number(form.editingId.value);
+      const nextId = editingId || Math.max(0, ...state.postings.map((p) => Number(p.id))) + 1;
+      const posting = buildPostingFromForm(form, nextId);
+
+      if (editingId) {
+        state.postings = state.postings.map((item) => Number(item.id) === editingId ? posting : item);
+      } else {
+        state.postings.push(posting);
+      }
+
       savePostings();
       try {
-        await postJson("/api/postings", posting);
+        if (editingId) {
+          await sendJson(`/api/postings/${editingId}`, "PUT", posting);
+        } else {
+          await postJson("/api/postings", posting);
+        }
       } catch {
         render();
       }
-      form.reset();
-      setDefaultDates();
-      syncSourceFields();
+      clearEditMode();
+      render();
+    }
+
+    async function deletePosting(id) {
+      const posting = state.postings.find((p) => Number(p.id) === Number(id));
+      if (!posting) return;
+      const confirmed = window.confirm(`'${posting.title}' 공고를 삭제하시겠습니까?`);
+      if (!confirmed) return;
+
+      state.postings = state.postings.filter((p) => Number(p.id) !== Number(id));
+      savePostings();
+      try {
+        await sendJson(`/api/postings/${id}`, "DELETE");
+      } catch {
+        render();
+      }
+      clearEditMode();
       render();
     }
 
@@ -799,14 +908,17 @@
 
     document.getElementById("posting-form").addEventListener("submit", (event) => {
       event.preventDefault();
-      addPosting(event.currentTarget);
+      savePosting(event.currentTarget);
     });
 
     document.getElementById("source").addEventListener("change", syncSourceFields);
 
+    document.getElementById("cancel-edit").addEventListener("click", clearEditMode);
+
     document.getElementById("reset-local").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
       state.postings = [...POSTINGS];
+      clearEditMode();
       render();
     });
 
@@ -829,9 +941,23 @@
     });
 
     document.getElementById("job-list").addEventListener("click", (event) => {
-      const button = event.target.closest("[data-stage-save]");
-      if (!button) return;
-      updateStage(button.dataset.stageSave);
+      const stageButton = event.target.closest("[data-stage-save]");
+      if (stageButton) {
+        updateStage(stageButton.dataset.stageSave);
+        return;
+      }
+
+      const editButton = event.target.closest("[data-edit-posting]");
+      if (editButton) {
+        const posting = state.postings.find((p) => Number(p.id) === Number(editButton.dataset.editPosting));
+        if (posting) setEditMode(posting);
+        return;
+      }
+
+      const deleteButton = event.target.closest("[data-delete-posting]");
+      if (deleteButton) {
+        deletePosting(deleteButton.dataset.deletePosting);
+      }
     });
 
     window.addEventListener("storage", (event) => {

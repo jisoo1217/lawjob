@@ -15,13 +15,19 @@ function readBasePostings() {
 
 function readState() {
   if (!fs.existsSync(statePath)) {
-    return { customPostings: [], stageOverrides: {} };
+    return { customPostings: [], stageOverrides: {}, postingOverrides: {}, deletedIds: [] };
   }
 
   try {
-    return JSON.parse(fs.readFileSync(statePath, "utf8"));
+    const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
+    return {
+      customPostings: state.customPostings || [],
+      stageOverrides: state.stageOverrides || {},
+      postingOverrides: state.postingOverrides || {},
+      deletedIds: state.deletedIds || []
+    };
   } catch {
-    return { customPostings: [], stageOverrides: {} };
+    return { customPostings: [], stageOverrides: {}, postingOverrides: {}, deletedIds: [] };
   }
 }
 
@@ -36,16 +42,41 @@ function normalizeStage(stage) {
 
 function mergedPostings() {
   const state = readState();
-  const postings = [...readBasePostings(), ...state.customPostings].map((posting) => {
-    const override = state.stageOverrides[String(posting.id)];
+  const deletedIds = new Set(state.deletedIds.map((id) => String(id)));
+  const postings = [...readBasePostings(), ...state.customPostings]
+    .filter((posting) => !deletedIds.has(String(posting.id)))
+    .map((posting) => {
+    const id = String(posting.id);
+    const postingOverride = state.postingOverrides[id] || {};
+    const override = state.stageOverrides[id];
+    const merged = { ...posting, ...postingOverride };
     return {
-      ...posting,
-      stage: normalizeStage(override?.stage || posting.stage),
-      stageCheckedAt: override?.stageCheckedAt || posting.stageCheckedAt || ""
+      ...merged,
+      stage: normalizeStage(override?.stage || merged.stage),
+      stageCheckedAt: override?.stageCheckedAt || merged.stageCheckedAt || ""
     };
   });
 
   return postings;
+}
+
+function sanitizePosting(input, id) {
+  return {
+    id,
+    source: input.source === "jobcenter" ? "jobcenter" : "seoulbar",
+    firm: String(input.firm || "").trim(),
+    title: String(input.title || "").trim(),
+    postedAt: String(input.postedAt || ""),
+    deadline: String(input.deadline || ""),
+    stage: normalizeStage(input.stage),
+    stageCheckedAt: String(input.stageCheckedAt || ""),
+    location: String(input.location || "").trim(),
+    salary: String(input.salary || "").trim(),
+    workHours: String(input.workHours || "").trim(),
+    applicationEmail: String(input.applicationEmail || "").trim(),
+    description: String(input.description || "").trim(),
+    externalUrl: String(input.externalUrl || "").trim()
+  };
 }
 
 function sendJson(res, status, body) {
@@ -134,16 +165,51 @@ const server = http.createServer(async (req, res) => {
       const state = readState();
       const existingIds = [...readBasePostings(), ...state.customPostings].map((posting) => Number(posting.id));
       const nextId = Math.max(0, ...existingIds) + 1;
-      const posting = {
-        ...body,
-        id: nextId,
-        stage: normalizeStage(body.stage),
-        stageCheckedAt: String(body.stageCheckedAt || "")
-      };
+      const posting = sanitizePosting(body, nextId);
 
       state.customPostings.push(posting);
       writeState(state);
       sendJson(res, 201, { postings: mergedPostings() });
+      return;
+    }
+
+    const postingMatch = url.pathname.match(/^\/api\/postings\/(\d+)$/);
+    if (postingMatch && req.method === "PUT") {
+      const id = Number(postingMatch[1]);
+      const body = await readBody(req);
+      const state = readState();
+      const posting = sanitizePosting(body, id);
+      const customIndex = state.customPostings.findIndex((item) => Number(item.id) === id);
+
+      if (customIndex >= 0) {
+        state.customPostings[customIndex] = posting;
+      } else {
+        state.postingOverrides[String(id)] = posting;
+      }
+
+      state.stageOverrides[String(id)] = {
+        stage: posting.stage,
+        stageCheckedAt: posting.stageCheckedAt
+      };
+      state.deletedIds = state.deletedIds.filter((deletedId) => Number(deletedId) !== id);
+      writeState(state);
+      sendJson(res, 200, { postings: mergedPostings() });
+      return;
+    }
+
+    if (postingMatch && req.method === "DELETE") {
+      const id = Number(postingMatch[1]);
+      const state = readState();
+      state.customPostings = state.customPostings.filter((item) => Number(item.id) !== id);
+      delete state.postingOverrides[String(id)];
+      delete state.stageOverrides[String(id)];
+
+      if (!state.deletedIds.some((deletedId) => Number(deletedId) === id)) {
+        state.deletedIds.push(id);
+      }
+
+      writeState(state);
+      sendJson(res, 200, { postings: mergedPostings() });
       return;
     }
 
