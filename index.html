@@ -408,6 +408,7 @@
         <div class="field">
           <label for="stage">채용 단계</label>
           <select id="stage" name="stage">
+            <option value="hidden">채용단계 표시 안 함</option>
             <option value="interview">면접 진행 중</option>
             <option value="done">채용 완료</option>
           </select>
@@ -476,6 +477,7 @@
   <script src="data.js"></script>
   <script>
     const STAGE_LABELS = {
+      hidden: "채용단계 표시 안 함",
       interview: "면접 진행 중",
       done: "채용 완료"
     };
@@ -525,7 +527,7 @@
     function normalizePostings(postings) {
       return postings.map((posting) => ({
         ...posting,
-        stage: posting.stage === "done" ? "done" : "interview"
+        stage: STAGE_LABELS[posting.stage] ? posting.stage : "interview"
       }));
     }
 
@@ -622,6 +624,14 @@
       const checked = p.stageCheckedAt ? `${p.stageCheckedAt} 확인` : "확인 시간 미상";
       const isJobcenter = p.source === "jobcenter";
       const details = isJobcenter ? "" : getVisibleDetails(p);
+      const stageBlock = normalizedStage === "hidden"
+        ? ""
+        : `
+          <div class="stage-row">
+            <span class="stage-badge ${normalizedStage}">${STAGE_LABELS[normalizedStage]}</span>
+            <span class="stage-checked">${checked}</span>
+          </div>
+        `;
       const action = isJobcenter
         ? `<a class="link-btn" href="${escapeHtml(p.externalUrl || "#")}" target="_blank" rel="noopener">게시글 열기</a>`
         : p.applicationEmail
@@ -642,10 +652,7 @@
             <span>등록 ${escapeHtml(p.postedAt)}</span>
             <span>마감 ${formatDeadline(p.deadline)}</span>
           </div>
-          <div class="stage-row">
-            <span class="stage-badge ${normalizedStage}">${STAGE_LABELS[normalizedStage]}</span>
-            <span class="stage-checked">${checked}</span>
-          </div>
+          ${stageBlock}
           ${details}
           <div class="card-actions">${action}</div>
           <div class="admin-stage">

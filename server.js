@@ -6,7 +6,7 @@ const vm = require("vm");
 const root = __dirname;
 const statePath = path.join(root, "server-state.json");
 const port = Number(process.env.PORT || 8080);
-const allowedStages = new Set(["interview", "done"]);
+const allowedStages = new Set(["hidden", "interview", "done"]);
 
 function readBasePostings() {
   const code = fs.readFileSync(path.join(root, "data.js"), "utf8");
@@ -30,6 +30,7 @@ function writeState(state) {
 }
 
 function normalizeStage(stage) {
+  if (stage === "hidden") return "hidden";
   return stage === "done" ? "done" : "interview";
 }
 
@@ -84,7 +85,11 @@ function contentType(filePath) {
 function serveStatic(req, res) {
   const requested = decodeURIComponent(new URL(req.url, `http://${req.headers.host}`).pathname);
   const safePath = requested === "/" ? "/index.html" : requested;
-  const filePath = path.normalize(path.join(root, safePath));
+  let filePath = path.normalize(path.join(root, safePath));
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+    filePath = path.join(filePath, "index.html");
+  }
 
   if (!filePath.startsWith(root) || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
     res.writeHead(404);
