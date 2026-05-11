@@ -572,6 +572,7 @@
     const ADMIN_QUERY = new URLSearchParams(window.location.search).get("admin") === "1";
     const ADMIN_SESSION_KEY = "lawjob-admin-auth";
     const STORAGE_KEY = "lawjob-postings-v2";
+    const DELETED_STORAGE_KEY = "lawjob-deleted-posting-ids-v1";
     const TODAY = new Date(new Date().toISOString().slice(0, 10));
 
     const state = {
@@ -607,12 +608,58 @@
 
     function mergeWithBasePostings(postings) {
       if (!Array.isArray(postings)) return [...POSTINGS];
-      const byId = new Map(POSTINGS.map((posting) => [String(posting.id), posting]));
+      const deletedIds = readDeletedIds();
+      const byId = new Map(
+        POSTINGS
+          .filter((posting) => !deletedIds.has(String(posting.id)))
+          .map((posting) => [String(posting.id), posting])
+      );
       postings.forEach((posting) => {
         if (!posting || posting.id === undefined || posting.id === null) return;
+        if (deletedIds.has(String(posting.id))) return;
         byId.set(String(posting.id), posting);
       });
       return [...byId.values()];
+    }
+
+    function readDeletedIds() {
+      try {
+        const ids = JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY) || "[]");
+        return new Set(Array.isArray(ids) ? ids.map(String) : []);
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveDeletedIds(ids) {
+      localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify([...ids].map(String)));
+    }
+
+    function markPostingDeleted(id) {
+      const deletedIds = readDeletedIds();
+      deletedIds.add(String(id));
+      saveDeletedIds(deletedIds);
+    }
+
+    function restorePostingId(id) {
+      const deletedIds = readDeletedIds();
+      deletedIds.delete(String(id));
+      saveDeletedIds(deletedIds);
+    }
+
+    function syncDeletedIdsFromServer(postings) {
+      if (!Array.isArray(postings)) return;
+      const serverIds = new Set(postings.map((posting) => String(posting.id)));
+      const deletedIds = readDeletedIds();
+      POSTINGS.forEach((posting) => {
+        const id = String(posting.id);
+        if (serverIds.has(id)) {
+          deletedIds.delete(id);
+        } else {
+          deletedIds.add(id);
+        }
+      });
+      saveDeletedIds(deletedIds);
     }
 
     function normalizePostings(postings) {
@@ -631,6 +678,7 @@
         const response = await fetch("/api/postings", { cache: "no-store" });
         if (!response.ok) return false;
         const data = await response.json();
+        syncDeletedIdsFromServer(data.postings || []);
         state.postings = normalizePostings(data.postings || []);
         savePostings();
         render();
@@ -878,8 +926,10 @@
       const posting = buildPostingFromForm(form, nextId);
 
       if (editingId) {
+        restorePostingId(editingId);
         state.postings = state.postings.map((item) => Number(item.id) === editingId ? posting : item);
       } else {
+        restorePostingId(nextId);
         state.postings.push(posting);
       }
 
@@ -904,6 +954,7 @@
       if (!confirmed) return;
 
       state.postings = state.postings.filter((p) => Number(p.id) !== Number(id));
+      markPostingDeleted(id);
       savePostings();
       try {
         await sendJson(`/api/postings/${id}`, "DELETE");
@@ -986,6 +1037,7 @@
 
     document.getElementById("reset-local").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(DELETED_STORAGE_KEY);
       state.postings = [...POSTINGS];
       clearEditMode();
       render();
@@ -1030,7 +1082,7 @@
     });
 
     window.addEventListener("storage", (event) => {
-      if (event.key !== STORAGE_KEY) return;
+      if (![STORAGE_KEY, DELETED_STORAGE_KEY].includes(event.key)) return;
       state.postings = loadPostings();
       render();
     });
