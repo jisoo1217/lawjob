@@ -599,10 +599,20 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return normalizePostings([...POSTINGS]);
       try {
-        return normalizePostings(JSON.parse(saved));
+        return normalizePostings(mergeWithBasePostings(JSON.parse(saved)));
       } catch {
         return normalizePostings([...POSTINGS]);
       }
+    }
+
+    function mergeWithBasePostings(postings) {
+      if (!Array.isArray(postings)) return [...POSTINGS];
+      const byId = new Map(POSTINGS.map((posting) => [String(posting.id), posting]));
+      postings.forEach((posting) => {
+        if (!posting || posting.id === undefined || posting.id === null) return;
+        byId.set(String(posting.id), posting);
+      });
+      return [...byId.values()];
     }
 
     function normalizePostings(postings) {
