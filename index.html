@@ -614,7 +614,8 @@
       source: "all",
       sort: "recent",
       admin: ADMIN_QUERY && sessionStorage.getItem(ADMIN_SESSION_KEY) === "1",
-      postings: loadPostings()
+      postings: loadPostings(),
+      expandedDetails: new Set()
     };
 
     function isRollingDeadline(value) {
@@ -805,8 +806,9 @@
         .map(([label, value]) => `<dt>${label}</dt><dd>${escapeHtml(value)}</dd>`)
         .join("");
 
+      const openAttr = state.expandedDetails.has(String(p.id)) ? " open" : "";
       return rows ? `
-        <details class="posting-details">
+        <details class="posting-details" data-posting-details="${p.id}"${openAttr}>
           <summary>공고 자세히 보기</summary>
           <dl class="detail-grid">${rows}</dl>
         </details>
@@ -1130,6 +1132,17 @@
         deletePosting(deleteButton.dataset.deletePosting);
       }
     });
+
+    document.getElementById("job-list").addEventListener("toggle", (event) => {
+      const details = event.target.closest("[data-posting-details]");
+      if (!details) return;
+      const id = String(details.dataset.postingDetails);
+      if (details.open) {
+        state.expandedDetails.add(id);
+      } else {
+        state.expandedDetails.delete(id);
+      }
+    }, true);
 
     window.addEventListener("storage", (event) => {
       if (![STORAGE_KEY, DELETED_STORAGE_KEY].includes(event.key)) return;
