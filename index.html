@@ -364,6 +364,38 @@
       overflow-wrap: anywhere;
     }
 
+    .posting-details {
+      margin: 12px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+    }
+
+    .posting-details summary {
+      cursor: pointer;
+      width: fit-content;
+      list-style: none;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .posting-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .posting-details summary::after {
+      content: " +";
+    }
+
+    .posting-details[open] summary {
+      margin-bottom: 10px;
+    }
+
+    .posting-details[open] summary::after {
+      content: " -";
+    }
+
     .admin-stage {
       display: none;
       grid-template-columns: 1fr 1fr auto;
@@ -773,7 +805,12 @@
         .map(([label, value]) => `<dt>${label}</dt><dd>${escapeHtml(value)}</dd>`)
         .join("");
 
-      return rows ? `<dl class="detail-grid">${rows}</dl>` : "";
+      return rows ? `
+        <details class="posting-details">
+          <summary>공고 자세히 보기</summary>
+          <dl class="detail-grid">${rows}</dl>
+        </details>
+      ` : "";
     }
 
     function renderCard(p) {
