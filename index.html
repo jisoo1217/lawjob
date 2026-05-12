@@ -345,7 +345,7 @@
 
     .detail-grid {
       display: grid;
-      grid-template-columns: 92px 1fr;
+      grid-template-columns: minmax(142px, max-content) 1fr;
       gap: 7px 10px;
       padding-top: 4px;
       margin-bottom: 12px;
@@ -355,6 +355,7 @@
     .detail-grid dt {
       color: var(--text-sub);
       font-weight: 800;
+      white-space: nowrap;
     }
 
     .detail-grid dd {
