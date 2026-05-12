@@ -450,7 +450,10 @@
         </div>
         <div class="field">
           <label for="deadline">마감일</label>
-          <input id="deadline" name="deadline" type="date" required />
+          <input id="deadline" name="deadline" type="text" list="deadline-options" placeholder="YYYY-MM-DD 또는 수시채용" required />
+          <datalist id="deadline-options">
+            <option value="수시채용"></option>
+          </datalist>
         </div>
         <div class="field source-field"><label for="address">주소</label><input id="address" name="address" /></div>
         <div class="field source-field"><label for="representative">대표</label><input id="representative" name="representative" /></div>
@@ -582,8 +585,14 @@
       postings: loadPostings()
     };
 
+    function isRollingDeadline(value) {
+      return String(value || "").trim() === "수시채용";
+    }
+
     function parseDate(str) {
-      return new Date(str || "2999-12-31");
+      if (isRollingDeadline(str)) return new Date("2999-12-31");
+      const date = new Date(str || "2999-12-31");
+      return Number.isNaN(date.getTime()) ? new Date("2999-12-31") : date;
     }
 
     function todayString() {
@@ -723,18 +732,22 @@
     }
 
     function diffDays(target) {
+      if (isRollingDeadline(target)) return null;
       const ms = parseDate(target) - TODAY;
       return Math.ceil(ms / (1000 * 60 * 60 * 24));
     }
 
     function formatDeadline(str) {
+      if (isRollingDeadline(str)) return "수시채용";
       const d = parseDate(str);
+      if (d.getFullYear() === 2999) return escapeHtml(str || "");
       const days = ["일", "월", "화", "수", "목", "금", "토"];
       return `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
     }
 
     function ddayLabel(deadline) {
       const d = diffDays(deadline);
+      if (d === null) return { text: "수시채용", cls: "active" };
       if (d > 0) return { text: `D-${d}`, cls: d <= 3 ? "urgent" : "active" };
       if (d === 0) return { text: "D-DAY", cls: "urgent" };
       return { text: "마감", cls: "closed" };
